@@ -1,0 +1,20 @@
+## Notations
+
+<SP>: space
+<CR>: Carriage return / Enter
+<C->: Control key
+<M->: Meta key
+
+
+## Exercise 1.1: Moving around in Emacs
+
+1.  e m a c s <SP> e x e r 1 . h t m l <CR>
+2.  <C-s> H T M L <CR>
+3.  <C-s> s c a v e n g e r <CR> <M-b>
+4.  <C-s> s e l f - r e f <CR> <M-b> <M-b>
+5.  <C-s> a r r o w <CR> <M-b>
+6.  <C-e>
+7.  <C-a>
+8.  I moved around using Emacs commands.
+9.  I moved around using Emacs commands.
+10. <C-x> <C-c>
