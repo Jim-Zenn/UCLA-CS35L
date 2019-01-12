@@ -60,3 +60,11 @@
     <C-y> <C-u> -1 <M-y> <CR>
     <C-y> <C-u> -1 <M-y> <CR>
     <C-y> <C-u> -1 <M-y> <CR>
+    <M->> <C-r> < ! - <C-r> <C-r> <C-SP> <C-u> 7 <C-f> <M-w>
+    <C-r> n o t h i n g <C-r> <M-f> <C-y> <CR>
+    <M->> <C-r> < ! - <C-r> <C-r> <C-r> <C-SP> <C-u> 3 <C-n> <M-w>
+    <C-r> S u b m i t < / h 2 > <C-r> <C-n> <C-n> <C-y> <C-p> <BS> <C-p> <BS>
+    <M->> <C-r> < ! - <C-r> <C-r> <C-r> <C-r> <C-SP> <C-e> <M-w>
+    <C-r> H o m e w o r k <C-r> <C-n> <C-n> <C-y>
+    <M->> <C-r> < ! - <C-r> <C-r> <C-r> <C-r> <C-r> <C-SP> <C-e> <M-w>
+    <C-r> L a b o r a t o r y <C-r> <C-n> <C-n> <C-y>
