@@ -47,5 +47,5 @@
 
 ## Exercise 1.4: Other editing tasks in Emacs
 
-1.  c a t <SP> e x e r 2 . h t m l <SP> d i f f <SP> > <SP> e x e r 4 . h t m l
+1.  `cat exer2.html exer2.diff > exer4.html`
 2. 
