@@ -88,7 +88,7 @@ PLEASE READ THE NOTATIONS ABOVE BEFORE YOU PROCEED!
     g 3 1 <SP> h e l l o . c <SP> - o <SP> h e l l o <CR> y
     <C-x> b h e l l o - o u t <CR> <C-u> <M-!> . / h e l l o <CR>
     <C-SP> <M->> <M-w> <C-x> <C-f> k e y 1 . t x t <M->> C-y
-#include <stdio.h>
+#include <stdio.h
 int
 main (void)
 {
@@ -99,4 +99,13 @@ main (void)
 }
 
 
-## Exercise 1.6: 
+## Exercise 1.6: Running Elisp Code
+
+1.  `emacs` <C-x> b <CR> 
+2.  ( r a n d o m <SP> " 1 2 3 - 4 5 6 - 7 8 9 " ) <C-j>   // output: -7711700448556449
+3.  ( s e t q <SP> x <SP> ( r a n d o m ) ) <C-j>  // output: -1153038529041916913
+    ( s e t q <SP> y <SP> ( r a n d o m ) ) <C-j>  // output: -906672388738810302
+4.  ( * x y ) <C-j>  // output: -2057086950941024802 (Overflow, not mathematically correct.)
+5.  <M-:> ( * x y ) <CR>  // Returns three forms of the answer: decimal, octal and hexadecimal
+6.  No, they are not truly random in the mathematical sense. Quote, "A series of pseudo-random numbers is generated in a deterministic fashion. The numbers are not truly random, but they have certain properties that mimic a random series." Reference: https://www.gnu.org/software/emacs/manual/html_node/elisp/Random-Numbers.html
+7.  Assume this is a n-bit machine. Since the two numbers are signed integers, we assume the first bits are used for sign purpose, leaving us with (n-1) bits. For a product to overflow, 
