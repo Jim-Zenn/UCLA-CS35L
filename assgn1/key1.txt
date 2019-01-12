@@ -68,3 +68,7 @@
     <C-r> H o m e w o r k <C-r> <C-n> <C-n> <C-y>
     <M->> <C-r> < ! - <C-r> <C-r> <C-r> <C-r> <C-r> <C-SP> <C-e> <M-w>
     <C-r> L a b o r a t o r y <C-r> <C-n> <C-n> <C-y>
+5.  <M->> <C-SP> <C-r> e n d <SP> o f <C-r> <C-n> <C-w>
+6.  <C-->
+7.  <CR> < ! - - <C-x> <C-x> - - >
+8.  <M-<> <M-%> < o l > <CR> < o L > !            // Replaced 7 occurrences
