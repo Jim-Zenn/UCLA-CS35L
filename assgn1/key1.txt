@@ -8,6 +8,8 @@
 
 * If surrounded by backticks '`', it's a shell command. Just enter and execute it directly in shell.
 
+PLEASE READ THE NOTATIONS ABOVE BEFORE YOU PROCEED!
+
 
 ## Exercise 1.1: Moving around in Emacs
 
@@ -72,3 +74,29 @@
 6.  <C-->
 7.  <CR> < ! - - <C-x> <C-x> - - >
 8.  <M-<> <M-%> < o l > <CR> < o L > !            // Replaced 7 occurrences
+9.  `diff -u exer1.html exer4.html > exer4.diff`
+
+
+## Exercise 1.5: Doing commands in Emacs
+
+0.  `emacs`
+1.  <M-x> m a k e - d i r e c t o r y <CR> ~ / j u n k <CR>
+2.  <C-x> <C-f> ~ / j u n k / h e l l o . c <CR>
+    (Enter the program)
+3.  <M-x> c o m p i l e 
+    (clear the minibuffer)
+    g 3 1 <SP> h e l l o . c <SP> - o <SP> h e l l o <CR> y
+    <C-x> b h e l l o - o u t <CR> <C-u> <M-!> . / h e l l o <CR>
+    <C-SP> <M->> <M-w> <C-x> <C-f> k e y 1 . t x t <M->> C-y
+#include <stdio.h>
+int
+main (void)
+{
+  char n = '\n', b = '\\', q = '"';
+  char const *p = "#include <stdio.h>%cint%cmain (void)%c{%c  char n = '%cn', b = '%c%c', q = '%c';%c  char const *p = %c%s%c;%c  printf (p, n, n, n, n, b, b, b, q, n, q, p, q, n, n, n, n);%c  return 0;%c}%c";
+  printf (p, n, n, n, n, b, b, b, q, n, q, p, q, n, n, n, n);
+  return 0;
+}
+
+
+## Exercise 1.6: 
