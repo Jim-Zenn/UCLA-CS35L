@@ -93,8 +93,8 @@
       Like ordinary incremental search except that your input is treated
       as a regexp.
     <C-M-t>
-      transpose-sexps: Like C-t (‘transpose-chars’), but applies to sexps.
-      Unlike ‘transpose-words’, point must be between the two sexps and not
+      transpose-sexps: Like C-t ('transpose-chars'), but applies to sexps.
+      Unlike 'transpose-words', point must be between the two sexps and not
       in the middle of a sexp to be transposed.
     <C-M-u>
       backward-up-list: Move backward out of one level of parentheses.
@@ -120,10 +120,7 @@
     Description (emacs keystrokes):
       <C-h> k <C-g>
 
-14. `yank` is an interactive compiled Lisp function in ‘simple.el’.
-    It is bound to C-y, <S-insertchar>, <S-insert>, <menu-bar> <edit> 
-    <paste>. 
-    `yank` reinserts ("paste") the last stretch of killed text.
+14. `yank` reinserts ("paste") the last stretch of killed text.
     More precisely, reinsert the most recent kill, which is the
     stretch of killed text most recently killed OR yanked.  Put point
     at the end, and set mark at the beginning without activating it.
