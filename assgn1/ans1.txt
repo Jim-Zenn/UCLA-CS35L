@@ -21,7 +21,6 @@
       ``` session
       $ readlink -e /usr/bin/emacs
       ```
-    Alternatively, use `ls -l` and the symbolic link
 
 5.  The version number of `/usr/bin/gcc` is "4.8.5 20150623 (Red Hat 4.8.-36)"
     The version number of `gcc` is "8.2.0"
@@ -47,9 +46,9 @@
 
 8.  Of the files in this directory, 292 sybolic links are found.
     Description:
-      By `which find` command, the directory that contains `find` is '/usr/bin'.
-      Then find all the simbolic links in the '/usr/bin' and count the lines with
-      `wc -l`.
+      By `which find` command, the directory that contains `find` is 
+      '/usr/bin'. Then find all the simbolic links in the '/usr/bin' and count 
+      the lines with `wc -l`.
       ``` shell
       $ which find
       $ find /usr/bin -type l | wc -l
@@ -57,8 +56,8 @@
 
 9.  'librom1394.so.0.3.0'
     Description:
-      Use `ls` command to list all files (-a) sorted by last modified time (-t) 
-      in reverse order (-r), and show only the first line using `head -n 1` 
+      Use `ls` command to list all files (-a) sorted by last modified time (-t)
+      in reverse order (-r), and show only the first line using `head -n 1`
       command.
       ``` shell
       $ ls /usr/lib64 -tar | head -n 1
@@ -66,11 +65,12 @@
 
 10. '/usr/lib/locale'
     Description:
-      By reading `man 7 locale` under 'ENVIRONMENT -> LOCPATH', it is clear that
-      if LOCPATH is set, compiled locale data files from `LOCPATH` and the system
-      default locale data path are used; otherwise, only the ones from the system
-      default locale data path are used. Since $LOCPATH is not set, according to
-      `man 7 locale` section 'FILE', the default path `/usr/lib/locale` is used.
+      By reading `man 7 locale` under 'ENVIRONMENT -> LOCPATH', it is clear
+      that if LOCPATH is set, compiled locale data files from `LOCPATH` and the
+      system default locale data path are used; otherwise, only the ones from
+      the system default locale data path are used. Since $LOCPATH is not set,
+      according to `man 7 locale` section 'FILE', the default path 
+      `/usr/lib/locale` is used.
       ``` shell
       $ man locale
       $ man 7 locale
