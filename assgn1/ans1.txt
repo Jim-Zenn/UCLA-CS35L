@@ -37,6 +37,20 @@
       Their meaning of 'uoga' '+-=' & 'rwxXst' are specified in `man chmod`.
 
 7.  `find /usr/local/cs -mtime -28 -type d`
+    Results:
+      /usr/local/cs
+      /usr/local/cs/src/bison
+      /usr/local/cs/src/bison/RCS
+      /usr/local/cs/src/grep
+      /usr/local/cs/src/grep/RCS
+      /usr/local/cs/src/ocaml
+      /usr/local/cs/src/ocaml/RCS
+      /usr/local/cs/share/info
+      /usr/local/cs/share/man/man1
+      /usr/local/cs/share/man/man3
+      /usr/local/cs/bin
+      /usr/local/cs/.del
+      ...
     Description:
       In `man find` I found following information:
       `-mtime n` requires that file's data was last modified n*24 hours ago.
