@@ -1,105 +1,145 @@
-1. man -k
-   Description:
-   I found this command by reading the manual of `man`.
+1.  man -k
+    Description:
+      I found this command by reading the manual of `man`.
 
-2. mv: '/usr/local/cs/bin/mv'
-   sh: '/usr/bin/sh'
-   Description:
-   ``` session
-   $ which mv  # locate `mv`
-   $ which sh  # locate `sh`
-   ```
+2.  mv: '/usr/local/cs/bin/mv'
+    sh: '/usr/bin/sh'
+    Description:
+      ``` session
+      $ which mv  # locate `mv`
+      $ which sh  # locate `sh`
+      ```
 
-3. `pr` and `tr`
-   Description:
-   ``` session
-   $ find /usr/local/cs/bin -executable -name "?r"
-   ```
+3.  `pr` and `tr`
+    Description:
+      ``` session
+      $ find /usr/local/cs/bin -executable -name "?r"
+      ```
 
-4. /usr/bin/emacs-24.3
-   Description:
-   ``` session
-   $ readlink -e /usr/bin/emacs
-   ```
-   Alternatively, use `ls -l` and the symbolic link
+4.  /usr/bin/emacs-24.3
+    Description:
+      ``` session
+      $ readlink -e /usr/bin/emacs
+      ```
 
-5. The version number of `/usr/bin/gcc` is "4.8.5 20150623 (Red Hat 4.8.-36)"
-   The version number of `gcc` is "8.2.0"
-   Description:
-   They are different because the former is the GCC executable at
-   '/usr/bin/gcc' while the latter is a symbolic link at
-   '/usr/local/cs/bin/gcc' to the GCC executable at
-   '/usr/local/cs/gcc-8.2.0/bin/gcc'.
-   Use '--version' flag to display the version of a GCC.
+5.  The version number of `/usr/bin/gcc` is "4.8.5 20150623 (Red Hat 4.8.-36)"
+    The version number of `gcc` is "8.2.0"
+    Description:
+      They are different because the former is the GCC executable at
+      '/usr/bin/gcc' while the latter is a symbolic link at
+      '/usr/local/cs/bin/gcc' to the GCC executable at
+      '/usr/local/cs/gcc-8.2.0/bin/gcc'.
+      Use '--version' flag to display the version of a GCC.
 
-6. u+sx: grant the owner execution permission and set the user id on execution
-   o-w : remove other users writing permission
-   Description:
-   Their meaning of 'uoga' '+-=' & 'rwxXst' are specified in `man chmod`.
+6.  u+sx: grant the owner execution permission and set the user id on execution
+    o-w : remove other users writing permission
+    Description:
+      Their meaning of 'uoga' '+-=' & 'rwxXst' are specified in `man chmod`.
 
-7. `find /usr/local/cs -mtime -28 -type d`
-   Description:
-   In `man find` I found following information:
-   `-mtime n` requires that file's data was last modified n*24 hours ago.
-   Numeric arguments can be specified as '+n' for greater than n, '-n' for less
-   then n, 'n' for exactly n. Notice that for `-atime` and `-mtime` options,
-   any fraction part is ignored.
+7.  `find /usr/local/cs -mtime -28 -type d`
+    Results:
+      /usr/local/cs
+      /usr/local/cs/src/bison
+      /usr/local/cs/src/bison/RCS
+      /usr/local/cs/src/grep
+      /usr/local/cs/src/grep/RCS
+      /usr/local/cs/src/ocaml
+      /usr/local/cs/src/ocaml/RCS
+      /usr/local/cs/share/info
+      /usr/local/cs/share/man/man1
+      /usr/local/cs/share/man/man3
+      /usr/local/cs/bin
+      /usr/local/cs/.del
+      ...
+    Description:
+      In `man find` I found following information:
+      `-mtime n` requires that file's data was last modified n*24 hours ago.
+      Numeric arguments can be specified as '+n' for greater than n, '-n' for 
+      less then n, 'n' for exactly n. Notice that for `-atime` and `-mtime` 
+      options, any fraction part is ignored.
 
-8. Of the files in this directory, 292 sybolic links are found.
-   Description:
-   By `which find` command, the directory that contains `find` is '/usr/bin'.
-   Then find all the simbolic links in the '/usr/bin' and count the lines with
-   `wc -l`.
-   ``` shell
-   $ which find
-   $ find /usr/bin -type l | wc -l
-   ```
+8.  Of the files in this directory, 292 sybolic links are found.
+    Description:
+      By `which find` command, the directory that contains `find` is 
+      '/usr/bin'. Then find all the simbolic links in the '/usr/bin' and count 
+      the lines with `wc -l`.
+      ``` shell
+      $ which find
+      $ find /usr/bin -type l | wc -l
+      ```
 
-9. 'librom1394.so.0.3.0'
-   Description:
-   Use `ls` command to list all files (-a) sorted by last modified time (-t) in
-   reverse order (-r), and show only the first line using `head -n 1` command.
-   ``` shell
-   $ ls /usr/lib64 -tar | head -n 1
-   ```
+9.  'librom1394.so.0.3.0'
+    Description:
+      Use `ls` command to list all files (-a) sorted by last modified time (-t)
+      in reverse order (-r), and show only the first line using `head -n 1`
+      command.
+      ``` shell
+      $ ls /usr/lib64 -tar | head -n 1
+      ```
 
 10. '/usr/lib/locale'
-   Description:
-   By reading `man 7 locale` under 'ENVIRONMENT -> LOCPATH', it is clear that
-   if LOCPATH is set, compiled locale data files from `LOCPATH` and the system
-   default locale data path are used; otherwise, only the ones from the system
-   default locale data path are used. Since $LOCPATH is not set, according to
-   `man 7 locale` section 'FILE', the default path `/usr/lib/locale` is used.
-   ``` shell
-   $ man locale
-   $ man 7 locale
-   $ echo $LOCPATH
-   ```
+    Description:
+      By reading `man 7 locale` under 'ENVIRONMENT -> LOCPATH', it is clear
+      that if LOCPATH is set, compiled locale data files from `LOCPATH` and the
+      system default locale data path are used; otherwise, only the ones from
+      the system default locale data path are used. Since $LOCPATH is not set,
+      according to `man 7 locale` section 'FILE', the default path 
+      `/usr/lib/locale` is used.
+      ``` shell
+      $ man locale
+      $ man 7 locale
+      $ echo $LOCPATH
+      ```
 
 11. `downcase-dwim` `downcase-region` `downcase-word`
-   description (emacs keystrokes):
-   <C-h> a d o w n c a s e
+    Description (emacs keystrokes):
+      <C-h> a d o w n c a s e
 
 12.
-   TODO: find out the rest.
-   <C-M-v>
-      runs the command xterm-paste (found in global-map),
-      which is an interactive compiled Lisp function in ‘term/xterm.el’.
+    <C-M-r>
+      isearch-backward-regexp: Do incremental search backward for regular
+      expression. With a prefix argument, do a regular string search instead.
+      Like ordinary incremental search except that your input is treated
+      as a regexp.
+    <C-M-s>
+      isearch-forward-regexp: Do incremental search forward for regular
+      expression. With a prefix argument, do a regular string search instead.
+      Like ordinary incremental search except that your input is treated
+      as a regexp.
+    <C-M-t>
+      transpose-sexps: Like C-t ('transpose-chars'), but applies to sexps.
+      Unlike 'transpose-words', point must be between the two sexps and not
+      in the middle of a sexp to be transposed.
+    <C-M-u>
+      backward-up-list: Move backward out of one level of parentheses.
+      This command will also work on other parentheses-like expressions
+      defined by the current language mode.  With ARG, do this that
+      many times.  A negative argument means move forward but still to
+      a less deep spot.  If ESCAPE-STRINGS is non-nil (as it is
+      interactively), move out of enclosing strings as well.  If
+      NO-SYNTAX-CROSSING is non-nil (as it is interactively), prefer to
+      break out of any enclosing string instead of moving to the start
+      of a list broken across multiple strings.  On error, location of
+      point is unspecified.
+    <C-M-v>
       xterm-paste: Handle the start of a terminal paste operation.
+    Description (emacs keystrokes):
+      <C-h> k <keys-to-know>
 
-13. According to emacs help, "<C-g> runs the command keyboard-quit (found in global-map), which is an interactive compiled Lisp function in 'simple.el'. The keyboard-quit function Signal a 'quit' condition. During execution of Lisp code, this character causes a quit directly. At top-level, as an editor command, this simply beeps."
-   description (emacs keystrokes):
-   <C-h> k <C-g>
+13. According to emacs help, "<C-g> runs the command keyboard-quit (found in 
+    global-map), which is an interactive compiled Lisp function in 'simple.el'.
+    The keyboard-quit function Signal a 'quit' condition. During execution of
+    Lisp code, this character causes a quit directly. At top-level, as an
+    editor command, this simply beeps."
+    Description (emacs keystrokes):
+      <C-h> k <C-g>
 
-14. `yank` is an interactive compiled Lisp function in ‘simple.el’.
-   It is bound to C-y, <S-insertchar>, <S-insert>, <menu-bar> <edit> 
-   <paste>. 
-   `yank` reinserts ("paste") the last stretch of killed text.
-   More precisely, reinsert the most recent kill, which is the
-   stretch of killed text most recently killed OR yanked.  Put point
-   at the end, and set mark at the beginning without activating it.
-   With just C-u as argument, put point at beginning, and mark at end.
-   With argument N, reinsert the Nth most recent kill.
+14. `yank` reinserts ("paste") the last stretch of killed text.
+    More precisely, reinsert the most recent kill, which is the
+    stretch of killed text most recently killed OR yanked.  Put point
+    at the end, and set mark at the beginning without activating it.
+    With just C-u as argument, put point at beginning, and mark at end.
+    With argument N, reinsert the Nth most recent kill.
 
 15. Unlike `ls -l` which is a one-time command to check files in a directory,
     emacs `dired` provides user with interactive navigation functionality
