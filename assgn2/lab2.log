@@ -1,16 +1,64 @@
-1. Before I changed the environment variable, `locale` command has the following output.
-LANG=en_US.UTF-8
-LC_CTYPE="en_US.UTF-8"
-LC_NUMERIC="en_US.UTF-8"
-LC_TIME="en_US.UTF-8"
-LC_COLLATE="en_US.UTF-8"
-LC_MONETARY="en_US.UTF-8"
-LC_MESSAGES="en_US.UTF-8"
-LC_PAPER="en_US.UTF-8"
-LC_NAME="en_US.UTF-8"
-LC_ADDRESS="en_US.UTF-8"
-LC_TELEPHONE="en_US.UTF-8"
-LC_MEASUREMENT="en_US.UTF-8"
-LC_IDENTIFICATION="en_US.UTF-8"
-LC_ALL=
+1.  Before I changed the environment variable, `locale` command has the following output.
+      LANG=en_US.UTF-8
+      LC_CTYPE="en_US.UTF-8"
+      LC_NUMERIC="en_US.UTF-8"
+      LC_TIME="en_US.UTF-8"
+      LC_COLLATE="en_US.UTF-8"
+      LC_MONETARY="en_US.UTF-8"
+      LC_MESSAGES="en_US.UTF-8"
+      LC_PAPER="en_US.UTF-8"
+      LC_NAME="en_US.UTF-8"
+      LC_ADDRESS="en_US.UTF-8"
+      LC_TELEPHONE="en_US.UTF-8"
+      LC_MEASUREMENT="en_US.UTF-8"
+      LC_IDENTIFICATION="en_US.UTF-8"
+      LC_ALL=
+    After I set `LC_ALL` to `C`, the locale outputs the following.
+      LANG=en_US.UTF-8
+      LC_CTYPE="C"
+      LC_NUMERIC="C"
+      LC_TIME="C"
+      LC_COLLATE="C"
+      LC_MONETARY="C"
+      LC_MESSAGES="C"
+      LC_PAPER="C"
+      LC_NAME="C"
+      LC_ADDRESS="C"
+      LC_TELEPHONE="C"
+      LC_MEASUREMENT="C"
+      LC_IDENTIFICATION="C"
+      LC_ALL=C
+
+2.  To sort the content of the file and output the result into a file named 
+    `words` in my working directory. I use the following command.
+    ``` shell
+    cat /usr/share/dict/words | sort > words
+    ```
+3.  I retrieved the HTML of the assignment webpage by the following command.
+    ``` shell
+    wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/assign2.html
+    ```
+    Starting here, I will explain what each of the following command does.
+    ``` shell
+    # Translate each non-letter character into a newline character.
+    tr -c 'A-Za-z' '[\n*]'
+    # In addition to what the above command does, it squeezes repeated newline
+    # characters into one occurrance, which yields a list of words.
+    tr -cs 'A-Za-z' '[\n*]'
+    # In addition to what the above command does, it sorts the list of words.
+    tr -cs 'A-Za-z' '[\n*]' | sort
+    # In addition to what the above command does, it only keep the unique words
+    # in the output list.
+    tr -cs 'A-Za-z' '[\n*]' | sort -u
+
+
+    # TODO: check the following two commands
+    # In addition to what the above command does, it compares the sorted list 
+    # of words with the locale word dictionary line by line.
+    tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
+    # In addition to what the above command does, it only shows the words that
+    # are unique to the sorted list of words from the webpage.
+    tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
+    ```
+
 
