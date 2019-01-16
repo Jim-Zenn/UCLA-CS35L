@@ -34,6 +34,7 @@
     ``` shell
     cat /usr/share/dict/words | sort > words
     ```
+
 3.  I retrieved the HTML of the assignment webpage by the following command.
     ``` shell
     wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/assign2.html
@@ -50,15 +51,19 @@
     # In addition to what the above command does, it only keep the unique words
     # in the output list.
     tr -cs 'A-Za-z' '[\n*]' | sort -u
-
-
-    # TODO: check the following two commands
     # In addition to what the above command does, it compares the sorted list 
-    # of words with the locale word dictionary line by line.
+    # of words with the locale word dictionary line by line, and outputs 3
+    # columns: words that are unique to the list, words that are unique to the
+    # dictionary file 'words', and common words.
     tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
     # In addition to what the above command does, it only shows the words that
     # are unique to the sorted list of words from the webpage.
     tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
     ```
 
+4.  I retrieved the HTML of page "English to Hawaiian" by the following 
+    command.
+    ``` shell
+    wget http://mauimapp.com/moolelo/hwnwdseng.htm -O raw.html
+    ```
 
