@@ -29,7 +29,7 @@
       LC_IDENTIFICATION="C"
       LC_ALL=C
 
-2.  To sort the content of the file and output the result into a file named 
+2.  To sort the content of the file and output the result into a file named
     `words` in my working directory. I use the following command.
     ``` shell
     cat /usr/share/dict/words | sort > words
@@ -66,4 +66,19 @@
     ``` shell
     wget http://mauimapp.com/moolelo/hwnwdseng.htm -O raw.html
     ```
+    And then I use the following shell script to get a list of Hawaiian word.
+    ``` shell
+    tr -d '\n' |
+    grep -o "<td>[^<]*\(<u>[^<]*</u>[^<]*\)*[^<]*</td> *</tr>" |
+    sed "s/<[^>]\+>//g;s/ \+$//g" |
+    tr -s ', ' '\n'
+    ```
+    The first `tr` command removes all the newlines in the html for easy
+    processing.
+    `grep` command then matches each `<td>` block that is right before the 
+    `</tr>`, taking into consideration the `<u>` block. The `-o` option outputs
+    each match on it's own line.
+    Next, we stripe away all HTML tags, all trailing spaces with `sed`.
+    Finally, we break commas into newlines and squeeze consecutive newlines
+    into one.
 
