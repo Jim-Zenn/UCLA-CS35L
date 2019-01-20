@@ -68,17 +68,38 @@
     ```
     And then I use the following shell script to get a list of Hawaiian word.
     ``` shell
+    tr "A-Z\`" "a-z\'" |
     tr -d '\n' |
     grep -o "<td>[^<]*\(<u>[^<]*</u>[^<]*\)*[^<]*</td> *</tr>" |
-    sed "s/<[^>]\+>//g;s/ \+$//g" |
-    tr -s ', ' '\n'
+    sed "s/<[^>]\+>//g;s/ \+$//g" | 
+    tr -s ', ' '\n' |
+    grep "[pk'mnwlhaeiou]" |
+    sort | uniq
     ```
-    The first `tr` command removes all the newlines in the html for easy
-    processing.
-    `grep` command then matches each `<td>` block that is right before the 
-    `</tr>`, taking into consideration the `<u>` block. The `-o` option outputs
-    each match on it's own line.
-    Next, we stripe away all HTML tags, all trailing spaces with `sed`.
-    Finally, we break commas into newlines and squeeze consecutive newlines
-    into one.
+    1. `tr`   treat upper case letters as if they were lower case;
+              treat ` as '.
+    2. `tr`   removes all the newlines in the html for easy processing.
+    3. `grep` matches each `<td>` block that is right before `</tr>`, taking 
+              into consideration the `<u>` block. The `-o` option makes sure 
+              that outputs each match on it's own line.
+    4. `sed`  remove all HTML tags and all trailing spaces with `sed`.
+    5. `tr`   replace commas and spaces with newlines and squeeze consecutive 
+              newlines into one.
+    6. `grep` keep only the lines with Hawaiian traditional orthography.
+    7. `sort` sort the result.
+    8. `uniq` remove duplicates.
+
+    As requested, this command checks the the spelling of Hawaiian rather than
+    English.
+    ``` shell
+    tr "A-Z" "a-z" | tr -cs "A-Za-z\'" "[\n*]" | sort -u | comm -23 - hwords
+    ```
+
+    Checking the Hawaiian spelling in `assign2.html`, I get 504 "misspelled"
+    Hawaiian words.
+    Checking the Hawaiian spelling in `hwords`, I get 2 "misspelled" words.
+    
+    "'a'ole" is a correct Hawaiian word, but not a correct English word.
+    "zyzzyvas" is a correct English word, but not a correct Hawaiian word.
+
 
