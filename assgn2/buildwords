@@ -2,7 +2,7 @@
 tr "A-Z\`" "a-z\'" |
 tr -d '\n' |
 grep -o "<td>[^<]*\(<u>[^<]*</u>[^<]*\)*[^<]*</td> *</tr>" |
-sed "s/<[^>]\+>//g;s/ \+$//g" | 
+sed "s/<[^>]\+>//g;s/ \+$//g" |
 tr -s ', ' '\n' |
-grep "[pk'mnwlhaeiou]" |
-sort | uniq
+grep -o "^[pk'mnwlhaeiou]\+$" |
+sort -u

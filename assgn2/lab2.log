@@ -73,8 +73,8 @@
     grep -o "<td>[^<]*\(<u>[^<]*</u>[^<]*\)*[^<]*</td> *</tr>" |
     sed "s/<[^>]\+>//g;s/ \+$//g" | 
     tr -s ', ' '\n' |
-    grep "[pk'mnwlhaeiou]" |
-    sort | uniq
+    grep -o "^[pk'mnwlhaeiou]\+$" |
+    sort -u
     ```
     1. `tr`   treat upper case letters as if they were lower case;
               treat ` as '.
@@ -86,8 +86,7 @@
     5. `tr`   replace commas and spaces with newlines and squeeze consecutive 
               newlines into one.
     6. `grep` keep only the lines with Hawaiian traditional orthography.
-    7. `sort` sort the result.
-    8. `uniq` remove duplicates.
+    7. `sort` sort the result, `-u` option keeps only the unique results.
 
     As requested, this command checks the the spelling of Hawaiian rather than
     English.
@@ -98,7 +97,7 @@
     Checking the Hawaiian spelling in `assign2.html`, I get 504 "misspelled"
     Hawaiian words.
     Checking the Hawaiian spelling in `hwords`, I get 2 "misspelled" words.
-    
+
     "'a'ole" is a correct Hawaiian word, but not a correct English word.
     "zyzzyvas" is a correct English word, but not a correct Hawaiian word.
 
