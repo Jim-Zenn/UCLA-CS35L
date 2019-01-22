@@ -94,9 +94,14 @@
     tr "A-Z" "a-z" | tr -cs "A-Za-z\'" "[\n*]" | sort -u | comm -23 - hwords
     ```
 
-    Checking the Hawaiian spelling in `assign2.html`, I get 504 "misspelled"
+    Since 'okina is part of Hawaiian, apostrophes on assign2.html are kept when
+    being checked for misspells.
+    Checking the Hawaiian spelling in `assign2.html`, I get 503 "misspelled"
     Hawaiian words.
-    Checking the Hawaiian spelling in `hwords`, I get 2 "misspelled" words.
+    Checking the English spelling in `assign2.html`, I get 42 "misspelled"
+    English words.
+    Checking the Hawaiian spelling in `hwords`, I get no misspells as
+    expected.
 
     "'a'ole" is a correct Hawaiian word, but not a correct English word.
     "zyzzyvas" is a correct English word, but not a correct Hawaiian word.

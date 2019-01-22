@@ -1,2 +1,2 @@
-tr "A-Z" "a-z" | tr -cs "A-Za-z\'" "[\n*]" | sort -u | comm -23 - hwords
+tr "A-Z" "a-z" | tr -cs "A-Za-z\'" "[\n*]" | sort -u | comm -23 - hwords | tr -s "\n"
 

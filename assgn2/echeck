@@ -1,0 +1,1 @@
+tr "A-Z" "a-z" | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words | tr -s "\n"
