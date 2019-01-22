@@ -16,9 +16,9 @@ function find-utf-8-text {
     then
       # exists and is a directory
       local j
-      for j in `ls $i`
+      for j in "$i"/*
       do
-        find-utf-8-text "$i/$j"
+        find-utf-8-text "$j"
       done
     else
       echo "$i doesn't exist"

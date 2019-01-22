@@ -16,7 +16,7 @@ function find-ascii-text {
     then
       # exists and is a directory
       local j
-      for j in "$i/*"
+      for j in "$i"/*
       do
         find-ascii-text "$j"
       done

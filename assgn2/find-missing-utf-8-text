@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function find-utf-8-text {
+function find-missing-utf-8-text {
   local i
   for i in "$@"
   do
@@ -20,9 +20,9 @@ function find-utf-8-text {
     then
       # exists and is a directory
       local j
-      for j in `ls $i`
+      for j in "$i"/*
       do
-        find-utf-8-text "$i/$j"
+        find-missing-utf-8-text "$j"
       done
     else
       echo "$i doesn't exist"
@@ -30,4 +30,4 @@ function find-utf-8-text {
   done
 }
 
-find-utf-8-text "$@"
+find-missing-utf-8-text "$@"
