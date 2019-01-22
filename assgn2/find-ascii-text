@@ -1,0 +1,29 @@
+#!/bin/bash
+
+function find-ascii-text {
+  local i
+  for i in "$@"
+  do
+    if [ -f "$i" ]
+    then
+      # exists and is a file
+      encoding=`file --mime-encoding $i`
+      if [ "$encoding" == "$i: us-ascii" ]
+      then
+        echo "$i"
+      fi
+    elif [ -d "$i" ]
+    then
+      # exists and is a directory
+      local j
+      for j in "$i/*"
+      do
+        find-ascii-text "$j"
+      done
+    else
+      echo "$i doesn't exist"
+    fi
+  done
+}
+
+find-ascii-text "$@"
