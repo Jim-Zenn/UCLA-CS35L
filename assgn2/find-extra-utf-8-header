@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function find-missing-utf-8-text {
+function find-extra-utf-8-header {
   local i
   for i in "$@"
   do
@@ -8,10 +8,10 @@ function find-missing-utf-8-text {
     then
       # exists and is a file
       encoding=`file --mime-encoding $i`
-      if [ "$encoding" == "$i: utf-8" ]
+      if [ "$encoding" == "$i: us-ascii" ]
       then
         first_line=`head -n 1 < $i`
-        if [ "$first_line" != "-*- coding: utf-8 -*-" ]
+        if [ "$first_line" == "-*- coding: utf-8 -*-" ]
         then
           echo "$i"
         fi
@@ -22,7 +22,7 @@ function find-missing-utf-8-text {
       local j
       for j in "$i"/*
       do
-        find-missing-utf-8-text "$j"
+        find-extra-utf-8-header "$j"
       done
     else
       echo "$i doesn't exist"
@@ -30,4 +30,4 @@ function find-missing-utf-8-text {
   done
 }
 
-find-missing-utf-8-text "$@"
+find-extra-utf-8-header "$@"
