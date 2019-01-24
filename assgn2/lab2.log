@@ -91,11 +91,12 @@
     As requested, this command checks the the spelling of Hawaiian rather than
     English.
     ``` shell
-    tr "A-Z" "a-z" | tr -cs "A-Za-z\'" "[\n*]" | sort -u | comm -23 - hwords
+    tr "A-Z" "a-z" | tr -cs "A-Za-z\'" "[\n*]" | sort -u |
+    comm -23 - hwords | wc -w
     ```
 
-    Since 'okina is part of Hawaiian, apostrophes on assign2.html are kept when
-    being checked for misspells.
+    ***** Since 'okina is part of Hawaiian, apostrophes on assign2.html are 
+    kept when being checked for misspells.
     Checking the Hawaiian spelling in `assign2.html`, I get 503 "misspelled"
     Hawaiian words.
     Checking the English spelling in `assign2.html`, I get 42 "misspelled"
@@ -103,7 +104,27 @@
     Checking the Hawaiian spelling in `hwords`, I get no misspells as
     expected.
 
-    "'a'ole" is a correct Hawaiian word, but not a correct English word.
-    "zyzzyvas" is a correct English word, but not a correct Hawaiian word.
+    Outputting the misspelled English words into a file called `emisspelled`
+    and the misspelled Hawaiian woords into a file called `hmisspelled`.
+    We can use the following shell commands too find out if these "misspells"
+    could actually mean something in the other language.
+    ``` shell
+    comm emisspelled hwords -23
+    comm hmisspelled words -23
+    ```
+    In `assign2.html` there are 3 words that are misspelled as English but are
+    legit Hawaiian words. Examples:
+    """
+    halau
+    lau
+    wiki
+    """
+    and there are 445 words that are misspelled as Hawaiian but are legit
+    English words. Examples:
+    """
+    able
+    about
+    above
+    """
 
 
