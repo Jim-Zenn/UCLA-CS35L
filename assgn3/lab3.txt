@@ -1,0 +1,20 @@
+lab3.txt
+
+:Author: Jim Zenn
+:Email: zenn@ucla.edu
+:Date: 2019-01-26 15:33
+
+1.  Grab Coreutils 8.29:
+    ``` shell
+    wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz
+    ```
+    Grab its signiture and the GNU keyring:
+    ``` shell
+    wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz.sig
+    wget https://ftp.gnu.org/gnu/gnu-keyring.gpg
+    ```
+    Verify the signiture using gpg:
+    ``` shell
+    gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig
+    ```
+
