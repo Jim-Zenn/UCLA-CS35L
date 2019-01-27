@@ -1,13 +1,8 @@
-tr -d '\n' < raw.html |                             # purge newlines
-sed -E 's/.*(<td>Adopt.*)<\/table>.*/<tr>\1/g' |    # capture rows
-sed -E 's/>[[:blank:]]*/>/g' |                      # purge unwanted spaces
-sed -E 's/<br>//g' |                                # purge <br>
-sed -E 's/<tr><td><\/td><td><\/td><\/tr>//g' |      # purge empty row
-sed -E 's/<font[^>]*>([^<]*)<\/font>/\1/g' |        # purge <font>
-sed -E 's/<small>[^<]*<\/small>//g' |               # purge <small>
-sed -E 's/<u>//g' |                                 # remove underline
-sed -E 's/<\/u>//g' |                               # remove underline
-sed -E 's/<tr><td>[^<]*<\/td>//g' > output.html     # remove English
-
-
-
+#! /bin/bash
+tr "A-Z\`" "a-z\'" |
+tr -d '\n' |
+grep -o "<td>[^<]*\(<u>[^<]*</u>[^<]*\)*[^<]*</td> *</tr>" |
+sed "s/<[^>]\+>//g;s/ \+$//g" |
+tr -s ', ' '\n' |
+grep -o "^[pk'mnwlhaeiou]\+$" |
+sort -u
