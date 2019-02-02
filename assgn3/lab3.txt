@@ -17,4 +17,132 @@ lab3.txt
     ``` shell
     gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig
     ```
+    I get the following output:
+    ```
+    gpg: Signature made Wed Dec 27 10:29:05 2017 PST using RSA key ID 306037D9
+    gpg: /u/eng/class/classqze/.gnupg/trustdb.gpg: trustdb created
+    gpg: Good signature from "Pdraig Brady <P@draigBrady.com>"
+    gpg:                 aka "Pdraig Brady <pbrady@redhat.com>"
+    gpg:                 aka "Pdraig Brady <pixelbeat@gnu.org>"
+    gpg: WARNING: This key is not certified with a trusted signature!
+    gpg:          There is no indication that the signature belongs to the owner.
+    Primary key fingerprint: 6C37 DC12 121A 5006 BC1D  B804 DF6F D971 3060 37D9
+    ```
+    // TODO: explain the "not certified trusted signiture issue"
+
+2.  I then use following commands to build the coreutils.
+    ``` shell
+    tar -xvf coreutils-8.29.tar.xz
+    ./configure
+    make
+    make all
+    ```
+
+3.  I can reproduce the bug by executing the following commands
+    ``` shell
+    ./src/ls -a -A
+    ./src/ls -A -a
+    ```
+    I get following results respectively,
+    ```
+    # command: ./src/ls -a -A
+    .                 GNUmakefile            aclocal.m4      init.cfg
+    ..                INSTALL                bootstrap       lib
+    .mailmap          Makefile               bootstrap.conf  m4
+    .prev-version     Makefile.am            build-aux       maint.mk
+    .tarball-version  Makefile.in            cfg.mk          man
+    .timestamp        NEWS                   config.log      po
+    .version          README                 config.status   src
+    .vg-suppressions  THANKS                 configure       tests
+    ABOUT-NLS         THANKS-to-translators  configure.ac    thanks-gen
+    AUTHORS           THANKS.in              dist-check.mk
+    COPYING           THANKStt.in            doc
+    ChangeLog         TODO                   gnulib-tests
+    ```
+    ```
+    # command: ./src/ls -A -a
+    .                 GNUmakefile            aclocal.m4      init.cfg
+    ..                INSTALL                bootstrap       lib
+    .mailmap          Makefile               bootstrap.conf  m4
+    .prev-version     Makefile.am            build-aux       maint.mk
+    .tarball-version  Makefile.in            cfg.mk          man
+    .timestamp        NEWS                   config.log      po
+    .version          README                 config.status   src
+    .vg-suppressions  THANKS                 configure       tests
+    ABOUT-NLS         THANKS-to-translators  configure.ac    thanks-gen
+    AUTHORS           THANKS.in              dist-check.mk
+    COPYING           THANKStt.in            doc
+    ChangeLog         TODO                   gnulib-tests
+    ```
+    As you can see, the bug exists.
+
+4.  I then download the patch and apply it.
+    ``` shell
+    cd coreutils-8.29
+    wget "https://debbugs.gnu.org/cgi/bugreport.cgi?att=1;filename=0001-ls-A-now-overrides-a.patch;bug=30963;msg=10" -O coreutils-patch
+    patch -p0 < coreutils-patch
+    ```
+
+    During the patch command, I get the following output:
+    ```
+    can't find file to patch at input line 23
+    Perhaps you used the wrong -p or --strip option?
+    The text leading up to this was:
+    --------------------------
+    |From 8969027d310e036f1c11f3d8f6da2e4a55ecb460 Mon Sep 17 00:00:00 2001
+    |From: Paul Eggert <eggert@cs.ucla.edu>
+    |Date: Tue, 27 Mar 2018 14:55:22 -0700
+    |Subject: [PATCH] ls: -A now overrides -a
+    |
+    |Problem reported by Karl Berry (Bug#30963).
+    |* NEWS: Mention this.
+    |* src/ls.c (decode_switches): Implement this.
+    |* tests/ls/a-option.sh: New file.
+    |* tests/local.mk (all_tests): Add it.
+    |---
+    | NEWS                 |  3 +++
+    | src/ls.c             |  3 +--
+    | tests/local.mk       |  1 +
+    | tests/ls/a-option.sh | 27 +++++++++++++++++++++++++++
+    | 4 files changed, 32 insertions(+), 2 deletions(-)
+    | create mode 100755 tests/ls/a-option.sh
+    |
+    |diff --git a/NEWS b/NEWS
+    |index 351a0827b..207e785b3 100644
+    |--- a/NEWS
+    |+++ b/NEWS
+    --------------------------
+    File to patch: NEWS
+    patching file NEWS
+    Hunk #1 FAILED at 4.
+    1 out of 1 hunk FAILED -- saving rejects to file NEWS.rej
+    can't find file to patch at input line 37
+    Perhaps you used the wrong -p or --strip option?
+    The text leading up to this was:
+    --------------------------
+    |diff --git a/src/ls.c b/src/ls.c
+    |index c89a22f68..bae2c1104 100644
+    |--- a/src/ls.c
+    |+++ b/src/ls.c
+    --------------------------
+    File to patch: src/ls.c
+    patching file src/ls.c
+    Hunk #1 succeeded at 1900 (offset -3 lines).
+    can't find file to patch at input line 51
+    Perhaps you used the wrong -p or --strip option?
+    The text leading up to this was:
+    --------------------------
+    |diff --git a/tests/local.mk b/tests/local.mk
+    |index c798cc83a..e60ea1d1e 100644
+    |--- a/tests/local.mk
+    |+++ b/tests/local.mk
+    --------------------------
+    File to patch: tests/local.mk
+    patching file tests/local.mk
+    patching file b/tests/ls/a-option.sh
+    ```
+    NEWS patching failed because the diff in the patch does not match the
+    actual context in the NEWS file. Hence, the patch was rejected.
+
+5.  
 
