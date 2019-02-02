@@ -32,10 +32,10 @@ Written by Jim Zenn.
 class Shuf:
     def __init__(self, lines, repeat, count):
         random.shuffle(lines)
-    self.lines = lines
-    self.repeat = repeat
-    self.count = count
-    self.index = 0
+        self.lines = lines
+        self.repeat = repeat
+        self.count = count
+        self.index = 0
 
     def __iter__(self):
         return self
