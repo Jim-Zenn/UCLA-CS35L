@@ -1,0 +1,7 @@
+hw3.txt
+
+:Author: Jim Zenn
+:Email: zenn@ucla.edu
+:Date: 2019-02-02 12:03
+
+Q3. 
