@@ -35,44 +35,33 @@ lab3.txt
     tar -xvf coreutils-8.29.tar.xz
     ./configure
     make
-    make all
+    ```
+    I created a temporary directory
+    ``` shell
+    mkdir $HOME/temporary
+    ```
+    and add it to $PATH.
+    ``` shell
+    export PATH="$HOME/temporary/usr/local/bin:$PATH"
+    ```
+    I then install coreutils into that temporary bin directory
+    ``` shell
+    make DESTDIR=$HOME/temporary install
     ```
 
 3.  I can reproduce the bug by executing the following commands
     ``` shell
-    ./src/ls -a -A
-    ./src/ls -A -a
+    ls -a -A
+    ls -A -a
     ```
-    I get following results respectively,
+    Under my home directory, I get following identical result,
     ```
-    # command: ./src/ls -a -A
-    .                 GNUmakefile            aclocal.m4      init.cfg
-    ..                INSTALL                bootstrap       lib
-    .mailmap          Makefile               bootstrap.conf  m4
-    .prev-version     Makefile.am            build-aux       maint.mk
-    .tarball-version  Makefile.in            cfg.mk          man
-    .timestamp        NEWS                   config.log      po
-    .version          README                 config.status   src
-    .vg-suppressions  THANKS                 configure       tests
-    ABOUT-NLS         THANKS-to-translators  configure.ac    thanks-gen
-    AUTHORS           THANKS.in              dist-check.mk
-    COPYING           THANKStt.in            doc
-    ChangeLog         TODO                   gnulib-tests
-    ```
-    ```
-    # command: ./src/ls -A -a
-    .                 GNUmakefile            aclocal.m4      init.cfg
-    ..                INSTALL                bootstrap       lib
-    .mailmap          Makefile               bootstrap.conf  m4
-    .prev-version     Makefile.am            build-aux       maint.mk
-    .tarball-version  Makefile.in            cfg.mk          man
-    .timestamp        NEWS                   config.log      po
-    .version          README                 config.status   src
-    .vg-suppressions  THANKS                 configure       tests
-    ABOUT-NLS         THANKS-to-translators  configure.ac    thanks-gen
-    AUTHORS           THANKS.in              dist-check.mk
-    COPYING           THANKStt.in            doc
-    ChangeLog         TODO                   gnulib-tests
+    .              .bash_profile  .emacs.d  .pki             CS32
+    ..             .bin           .gnupg    .profile         CS35L
+    ._Set.cpp      .cache         .lesshst  .python_history  perl5
+    ._Set.h        .ccache        .local    .ssh             temporary
+    .bash_history  .config        .login    .vim
+    .bash_logout   .cshrc         .logout   .viminfo
     ```
     As you can see, the bug exists.
 
@@ -135,7 +124,7 @@ lab3.txt
     |diff --git a/tests/local.mk b/tests/local.mk
     |index c798cc83a..e60ea1d1e 100644
     |--- a/tests/local.mk
-    |+++ b/tests/local.mk
+    |+++ b/tests/local.Gmk
     --------------------------
     File to patch: tests/local.mk
     patching file tests/local.mk
@@ -144,5 +133,50 @@ lab3.txt
     NEWS patching failed because the diff in the patch does not match the
     actual context in the NEWS file. Hence, the patch was rejected.
 
-5.  
+5.  Then I `make` again. The whole coreutils, including all the manuals, was
+    rebuilt, where in fact only ls.c related files need to be built.
 
+6.  Now I execute
+    ``` shell
+    src/ls -a -A
+    src/ls -A -a
+    ``` src/ls -a -A
+    I get following results respectively
+    ```
+    .mailmap          NEWS.orig              config.status
+    .prev-version     NEWS.rej               configure
+    .tarball-version  README                 configure.ac
+    .timestamp        THANKS                 coreutils-patch
+    .version          THANKS-to-translators  dist-check.mk
+    .vg-suppressions  THANKS.in              doc
+    ABOUT-NLS         THANKStt.in            gnulib-tests
+    AUTHORS           TODO                   init.cfg
+    COPYING           aclocal.m4             lib
+    ChangeLog         autom4te.cache         m4
+    GNUmakefile       b                      maint.mk
+    INSTALL           bootstrap              man
+    Makefile          bootstrap.conf         po
+    Makefile.am       build-aux              src
+    Makefile.in       cfg.mk                 tests
+    NEWS              config.log             thanks-gen
+    ```
+    ``` src/ls -A -a
+    .                 NEWS                   config.status
+    ..                NEWS.orig              configure
+    .mailmap          NEWS.rej               configure.ac
+    .prev-version     README                 coreutils-patch
+    .tarball-version  THANKS                 dist-check.mk
+    .timestamp        THANKS-to-translators  doc
+    .version          THANKS.in              gnulib-tests
+    .vg-suppressions  THANKStt.in            init.cfg
+    ABOUT-NLS         TODO                   lib
+    AUTHORS           aclocal.m4             m4
+    COPYING           autom4te.cache         maint.mk
+    ChangeLog         b                      man
+    GNUmakefile       bootstrap              po
+    INSTALL           bootstrap.conf         src
+    Makefile          build-aux              tests
+    Makefile.am       cfg.mk                 thanks-gen
+    Makefile.in       config.log
+    ```
+    As you can see, the bug is fixed.
