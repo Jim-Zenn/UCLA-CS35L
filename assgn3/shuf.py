@@ -40,7 +40,7 @@ class Shuf:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.count == 0 or self.index == len(self.lines):
             raise StopIteration
         if self.repeat:
@@ -104,7 +104,7 @@ def main():
     # write to stdout line by line
     shuf = Shuf(lines, options.repeat, options.head_count)
     for line in shuf:
-        print line
+        sys.stdout.write(line)
 
 
 if __name__ == "__main__":
