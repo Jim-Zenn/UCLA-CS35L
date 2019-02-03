@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/local/cs/bin/python3
 #
 # Copyright 2019 Jim Zenn <zenn@ucla.edu>
 #
