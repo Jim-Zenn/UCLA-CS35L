@@ -1,0 +1,23 @@
+hw3.txt
+
+:Author: Jim Zenn
+:Email: zenn@ucla.edu
+:Date: 2019-02-02 12:03
+
+Q1. The patch actually makes the performace of `ls` better, because it removes
+    an if statement.
+
+Q2. This patched version will have different behavior (i.e. output) with the
+    GNU standard version. Hence, if a shell script depends on the output of
+    `ls` with option -A, it might be broken because of this introduced
+    inconsistancy.
+
+Q3. When "randline.py" is invoked on an empty file (e.g. /dev/null), an error
+    is thrown since in `randline.chooseline` method, random.choice does not
+    take an empty sequence as input.
+
+Q4. There would be a syntax error in Python 3 on line 65 of "randline.py",
+    because unlike exceptions in Python 2, exceptions in Python 3 are not
+    iterable.
+
+

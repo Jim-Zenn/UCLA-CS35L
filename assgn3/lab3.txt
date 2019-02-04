@@ -1,0 +1,182 @@
+lab3.txt
+
+:Author: Jim Zenn
+:Email: zenn@ucla.edu
+:Date: 2019-01-26 15:33
+
+1.  Grab Coreutils 8.29:
+    ``` shell
+    wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz
+    ```
+    Grab its signiture and the GNU keyring:
+    ``` shell
+    wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz.sig
+    wget https://ftp.gnu.org/gnu/gnu-keyring.gpg
+    ```
+    Verify the signiture using gpg:
+    ``` shell
+    gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig
+    ```
+    I get the following output:
+    ```
+    gpg: Signature made Wed Dec 27 10:29:05 2017 PST using RSA key ID 306037D9
+    gpg: /u/eng/class/classqze/.gnupg/trustdb.gpg: trustdb created
+    gpg: Good signature from "Pdraig Brady <P@draigBrady.com>"
+    gpg:                 aka "Pdraig Brady <pbrady@redhat.com>"
+    gpg:                 aka "Pdraig Brady <pixelbeat@gnu.org>"
+    gpg: WARNING: This key is not certified with a trusted signature!
+    gpg:          There is no indication that the signature belongs to the owner.
+    Primary key fingerprint: 6C37 DC12 121A 5006 BC1D  B804 DF6F D971 3060 37D9
+    ```
+    // TODO: explain the "not certified trusted signiture issue"
+
+2.  I then use following commands to build the coreutils.
+    ``` shell
+    tar -xvf coreutils-8.29.tar.xz
+    ./configure
+    make
+    ```
+    I created a temporary directory
+    ``` shell
+    mkdir $HOME/temporary
+    ```
+    and add it to $PATH.
+    ``` shell
+    export PATH="$HOME/temporary/usr/local/bin:$PATH"
+    ```
+    I then install coreutils into that temporary bin directory
+    ``` shell
+    make DESTDIR=$HOME/temporary install
+    ```
+
+3.  I can reproduce the bug by executing the following commands
+    ``` shell
+    ls -a -A
+    ls -A -a
+    ```
+    Under my home directory, I get following identical result,
+    ```
+    .              .bash_profile  .emacs.d  .pki             CS32
+    ..             .bin           .gnupg    .profile         CS35L
+    ._Set.cpp      .cache         .lesshst  .python_history  perl5
+    ._Set.h        .ccache        .local    .ssh             temporary
+    .bash_history  .config        .login    .vim
+    .bash_logout   .cshrc         .logout   .viminfo
+    ```
+    As you can see, the bug exists.
+
+4.  I then download the patch and apply it.
+    ``` shell
+    cd coreutils-8.29
+    wget "https://debbugs.gnu.org/cgi/bugreport.cgi?att=1;filename=0001-ls-A-now-overrides-a.patch;bug=30963;msg=10" -O coreutils-patch
+    patch -p0 < coreutils-patch
+    ```
+
+    During the patch command, I get the following output:
+    ```
+    can't find file to patch at input line 23
+    Perhaps you used the wrong -p or --strip option?
+    The text leading up to this was:
+    --------------------------
+    |From 8969027d310e036f1c11f3d8f6da2e4a55ecb460 Mon Sep 17 00:00:00 2001
+    |From: Paul Eggert <eggert@cs.ucla.edu>
+    |Date: Tue, 27 Mar 2018 14:55:22 -0700
+    |Subject: [PATCH] ls: -A now overrides -a
+    |
+    |Problem reported by Karl Berry (Bug#30963).
+    |* NEWS: Mention this.
+    |* src/ls.c (decode_switches): Implement this.
+    |* tests/ls/a-option.sh: New file.
+    |* tests/local.mk (all_tests): Add it.
+    |---
+    | NEWS                 |  3 +++
+    | src/ls.c             |  3 +--
+    | tests/local.mk       |  1 +
+    | tests/ls/a-option.sh | 27 +++++++++++++++++++++++++++
+    | 4 files changed, 32 insertions(+), 2 deletions(-)
+    | create mode 100755 tests/ls/a-option.sh
+    |
+    |diff --git a/NEWS b/NEWS
+    |index 351a0827b..207e785b3 100644
+    |--- a/NEWS
+    |+++ b/NEWS
+    --------------------------
+    File to patch: NEWS
+    patching file NEWS
+    Hunk #1 FAILED at 4.
+    1 out of 1 hunk FAILED -- saving rejects to file NEWS.rej
+    can't find file to patch at input line 37
+    Perhaps you used the wrong -p or --strip option?
+    The text leading up to this was:
+    --------------------------
+    |diff --git a/src/ls.c b/src/ls.c
+    |index c89a22f68..bae2c1104 100644
+    |--- a/src/ls.c
+    |+++ b/src/ls.c
+    --------------------------
+    File to patch: src/ls.c
+    patching file src/ls.c
+    Hunk #1 succeeded at 1900 (offset -3 lines).
+    can't find file to patch at input line 51
+    Perhaps you used the wrong -p or --strip option?
+    The text leading up to this was:
+    --------------------------
+    |diff --git a/tests/local.mk b/tests/local.mk
+    |index c798cc83a..e60ea1d1e 100644
+    |--- a/tests/local.mk
+    |+++ b/tests/local.Gmk
+    --------------------------
+    File to patch: tests/local.mk
+    patching file tests/local.mk
+    patching file b/tests/ls/a-option.sh
+    ```
+    NEWS patching failed because the diff in the patch does not match the
+    actual context in the NEWS file. Hence, the patch was rejected.
+
+5.  Then I `make` again. The whole coreutils, including all the manuals, was
+    rebuilt, where in fact only ls.c related files need to be built.
+
+6.  Now I execute
+    ``` shell
+    src/ls -a -A
+    src/ls -A -a
+    ``` src/ls -a -A
+    I get following results respectively
+    ```
+    .mailmap          NEWS.orig              config.status
+    .prev-version     NEWS.rej               configure
+    .tarball-version  README                 configure.ac
+    .timestamp        THANKS                 coreutils-patch
+    .version          THANKS-to-translators  dist-check.mk
+    .vg-suppressions  THANKS.in              doc
+    ABOUT-NLS         THANKStt.in            gnulib-tests
+    AUTHORS           TODO                   init.cfg
+    COPYING           aclocal.m4             lib
+    ChangeLog         autom4te.cache         m4
+    GNUmakefile       b                      maint.mk
+    INSTALL           bootstrap              man
+    Makefile          bootstrap.conf         po
+    Makefile.am       build-aux              src
+    Makefile.in       cfg.mk                 tests
+    NEWS              config.log             thanks-gen
+    ```
+    ``` src/ls -A -a
+    .                 NEWS                   config.status
+    ..                NEWS.orig              configure
+    .mailmap          NEWS.rej               configure.ac
+    .prev-version     README                 coreutils-patch
+    .tarball-version  THANKS                 dist-check.mk
+    .timestamp        THANKS-to-translators  doc
+    .version          THANKS.in              gnulib-tests
+    .vg-suppressions  THANKStt.in            init.cfg
+    ABOUT-NLS         TODO                   lib
+    AUTHORS           aclocal.m4             m4
+    COPYING           autom4te.cache         maint.mk
+    ChangeLog         b                      man
+    GNUmakefile       bootstrap              po
+    INSTALL           bootstrap.conf         src
+    Makefile          build-aux              tests
+    Makefile.am       cfg.mk                 thanks-gen
+    Makefile.in       config.log
+    ```
+    As you can see, the bug is fixed.
