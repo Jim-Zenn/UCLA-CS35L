@@ -3,8 +3,35 @@ First I get that verion of `coreutils` with `wget`, decompress the file with
 ``` shell
 wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/coreutils-with-bug.tar.gz
 tar xf coreutils-with-bug.tar.gz
+cd coreutils-withbug/
 ./configure --prefix=$HOME/temporary/lab4
 make
 make install
 ```
 
+An error would occur during install:
+``` log
+In file included from utimecmp.c:41:
+utimens.h:2:5: error: conflicting types for 'futimens'
+ int futimens (int, char const *, struct timespec const [2]);
+     ^~~~~~~~
+In file included from utimecmp.h:25,
+                 from utimecmp.c:25:
+/usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens'
+was here
+ extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+            ^~~~~~~~
+```
+
+To fix this issue, use this patch and install again.
+```
+wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/coreutils.diff
+cd coreutils-with-bug
+patch < ../coreutils.diff -p0
+make
+make install
+```
+
+The issue was that `futimens` and `tee` functions used are not defined.
+The patch make the source code use `coreutils_futimens` and  `coreutils_tee`
+instead, which are present.
