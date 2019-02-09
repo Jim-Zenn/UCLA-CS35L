@@ -24,7 +24,7 @@ was here
 ```
 
 To fix this issue, use this patch and install again.
-```
+``` shell
 wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/coreutils.diff
 cd coreutils-with-bug
 patch < ../coreutils.diff -p0
@@ -35,3 +35,129 @@ make install
 The issue was that `futimens` and `tee` functions used are not defined.
 The patch make the source code use `coreutils_futimens` and  `coreutils_tee`
 instead, which are present.
+
+I can reproduce the problem by using the following example:
+``` shell
+tmp=$(mktemp -d)
+cd $tmp
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+```
+I get the following output:
+```
+-rw-r--r-- 1 classqze class 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 classqze class 0 2019-02-09 19:53:16.254025731 +0000 now1
+-rw-r--r-- 1 classqze class 0 2019-02-09 19:53:15.251008507 +0000 now
+```
+-t option should sort the files by modification time, newest first.
+However, the output of the bugged coreutils ls put the oldest file first.
+
+By looking through the source code at `coreutils-with-bug/src/ls.c`,
+I find the option '-t' is related to sort_type 'sort_time', and the 
+sorting happens in `sort_files` function, sort_time -> time_mtime case 
+(line 2974), which decides to call `compare_mtime` function, if reverse
+order is not specified.
+To make sure there is only one time comparison happening, I remove now
+and only keep now1.
+
+To find what is wrong exactly, I use `gdb` to debug the ls binary file.
+``` Shell
+gdb $HOME/temporary/lab4/bin/ls
+```
+I first use `info functions` command to spot the function I want to
+debug.
+``` gdb
+info functions compare_mtime
+```
+I get the following output. GDB spots the `compare_mtime` function in
+ls.c file line 2884.
+``` gdb (log)
+All functions matching regular expression "compare_mtime":
+
+File ls.c:
+2884:   static int compare_mtime(V, V);
+```
+I add a breakpoint , and run the function with option '-lt'
+``` gdb (log)
+(gdb) break compare_mtime
+Breakpoint 1 at 0x4070a0: compare_mtime. (2 locations)
+(gdb) run -lt
+Starting program: /w/home.03/class/classqze/temporary/lab4/bin/ls -lt
+
+Breakpoint 1, compare_mtime (a=0x617100, b=0x6171b0) at ls.c:2884
+2884    static int compare_mtime (V a, V b) { return cmp_mtime (a, b, xstrcoll); }
+(gdb) stepi
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:49
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+(gdb) print diff
+$1 = -1131397365
+```
+The huge negative number is likely a result of overflow.
+I write a simple python script to check the true time difference between
+"2019-02-09 12:25:31" and "1918-11-11 03:00:00".
+``` Python 3
+from datetime import datetime
+import time
+
+fmt = '%Y-%m-%d %H:%M:%S'
+a = '1918-11-11 03:00:00'
+b = '2019-02-09 12:25:31'
+
+d1 = datetime.strptime(a, fmt)
+d2 = datetime.strptime(b, fmt)
+
+d1_ts = time.mktime(d1.timetuple())
+d2_ts = time.mktime(d2.timetuple())
+
+print(int(d2_ts - d1_ts))
+```
+
+It appears the correct time difference should be 3163569931.
+I write a short C program to check the limit of int in C.
+
+```C
+#include <stdio.h>
+#include <limits.h>
+
+int main() {
+    printf("INT_MIN: %d\n", INT_MIN);
+    printf("INT_MAX: %d\n", INT_MAX);
+    printf("LONG_MIN: %ld\n", LONG_MIN);
+    printf("LONG_MAX: %ld\n", LONG_MAX);
+    return 0;
+}
+```
+The output shows that
+```
+INT_MIN: -2147483648
+INT_MAX: 2147483647
+LONG_MIN: -9223372036854775808
+LONG_MAX: 9223372036854775807
+```
+
+Obviously the number has overflown.
+To fix this problem, we need change the variable `diff` in `timespec_cmp` 
+function in `lib/timespec.h` from type int to type long.
+
+The new function looks like following:
+``` C
+/* Return negative, zero, positive if A < B, A == B, A > B, respectively.
+   Assume the nanosecond components are in range, or close to it.  */
+static inline int
+timespec_cmp (struct timespec a, struct timespec b)
+{
+  long diff = a.tv_sec - b.tv_sec;
+  return diff ? diff : a.tv_nsec - b.tv_nsec;
+}
+```
+The patch file looks like this:
+```
+48c48
+<   long diff = a.tv_sec - b.tv_sec;
+---
+>   int diff = a.tv_sec - b.tv_sec;
+```
+
