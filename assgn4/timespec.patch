@@ -1,0 +1,4 @@
+48c48
+<   long diff = a.tv_sec - b.tv_sec;
+---
+>   int diff = a.tv_sec - b.tv_sec;
