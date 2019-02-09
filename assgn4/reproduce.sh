@@ -1,6 +1,5 @@
 #! /bin/sh
-tmp=$(mktemp -d)
-cd $tmp
+cd ~
 touch -d '1918-11-11 11:00 GMT' wwi-armistice
 touch now
 sleep 1
