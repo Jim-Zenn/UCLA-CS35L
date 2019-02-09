@@ -1,0 +1,10 @@
+First I get that verion of `coreutils` with `wget`, decompress the file with 
+`tar`, and build it.
+``` shell
+wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/coreutils-with-bug.tar.gz
+tar xf coreutils-with-bug.tar.gz
+./configure --prefix=$HOME/temporary/lab4
+make
+make install
+```
+
