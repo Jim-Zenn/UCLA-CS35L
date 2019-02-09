@@ -25,7 +25,8 @@ lab3.txt
     gpg:                 aka "Pdraig Brady <pbrady@redhat.com>"
     gpg:                 aka "Pdraig Brady <pixelbeat@gnu.org>"
     gpg: WARNING: This key is not certified with a trusted signature!
-    gpg:          There is no indication that the signature belongs to the owner.
+    gpg:          There is no indication that the signature belongs to the 
+    gpg:          owner.
     Primary key fingerprint: 6C37 DC12 121A 5006 BC1D  B804 DF6F D971 3060 37D9
     ```
     // TODO: explain the "not certified trusted signiture issue"
@@ -68,7 +69,8 @@ lab3.txt
 4.  I then download the patch and apply it.
     ``` shell
     cd coreutils-8.29
-    wget "https://debbugs.gnu.org/cgi/bugreport.cgi?att=1;filename=0001-ls-A-now-overrides-a.patch;bug=30963;msg=10" -O coreutils-patch
+    wget "https://debbugs.gnu.org/cgi/bugreport.cgi?att=1;filename="\
+    "0001-ls-A-now-overrides-a.patch;bug=30963;msg=10" -O coreutils-patch"
     patch -p0 < coreutils-patch
     ```
 

@@ -104,7 +104,7 @@ def main():
     # write to stdout line by line
     shuf = Shuf(lines, options.repeat, options.head_count)
     for line in shuf:
-        sys.stdout.write(line)
+        sys.stdout.write(line + '\n')
 
 
 if __name__ == "__main__":
