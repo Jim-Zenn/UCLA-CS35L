@@ -80,6 +80,7 @@ int main() {
   for (int k = 0; k < word_count; k ++) {
     free(arrbuf[k]);
   }
+  free(arrbuf);
 
   return 0;
 }
