@@ -1,4 +1,4 @@
-First I get that verion of `coreutils` with `wget`, decompress the file with 
+First I get that verion of `coreutils` with `wget`, decompress the file with
 `tar`, and build it.
 ``` shell
 wget https://web.cs.ucla.edu/classes/winter19/cs35L/assign/coreutils-with-bug.tar.gz
@@ -35,7 +35,6 @@ make install
 The issue was that `futimens` and `tee` functions used are not defined.
 The patch make the source code use `coreutils_futimens` and  `coreutils_tee`
 instead, which are present.
-
 I can reproduce the problem by using the following example:
 ``` shell
 tmp=$(mktemp -d)
@@ -56,8 +55,8 @@ I get the following output:
 However, the output of the bugged coreutils ls put the oldest file first.
 
 By looking through the source code at `coreutils-with-bug/src/ls.c`,
-I find the option '-t' is related to sort_type 'sort_time', and the 
-sorting happens in `sort_files` function, sort_time -> time_mtime case 
+I find the option '-t' is related to sort_type 'sort_time', and the
+sorting happens in `sort_files` function, sort_time -> time_mtime case
 (line 2974), which decides to call `compare_mtime` function, if reverse
 order is not specified.
 To make sure there is only one time comparison happening, I remove now
@@ -70,7 +69,7 @@ gdb $HOME/temporary/lab4/bin/ls
 I first use `info functions` command to spot the function I want to
 debug.
 ``` gdb
-info functions compare_mtime
+(gdb) info functions compare_mtime
 ```
 I get the following output. GDB spots the `compare_mtime` function in
 ls.c file line 2884.
@@ -95,33 +94,28 @@ timespec_cmp (b=..., a=...) at ../lib/timespec.h:49
 (gdb) print diff
 $1 = -1131397365
 ```
+
 The huge negative number is likely a result of overflow.
 I write a simple python script to check the true time difference between
 "2019-02-09 12:25:31" and "1918-11-11 03:00:00".
 ``` Python 3
 from datetime import datetime
 import time
-
 fmt = '%Y-%m-%d %H:%M:%S'
 a = '1918-11-11 03:00:00'
 b = '2019-02-09 12:25:31'
-
 d1 = datetime.strptime(a, fmt)
 d2 = datetime.strptime(b, fmt)
-
 d1_ts = time.mktime(d1.timetuple())
 d2_ts = time.mktime(d2.timetuple())
-
 print(int(d2_ts - d1_ts))
 ```
 
 It appears the correct time difference should be 3163569931.
 I write a short C program to check the limit of int in C.
-
-```C
+``` C
 #include <stdio.h>
 #include <limits.h>
-
 int main() {
     printf("INT_MIN: %d\n", INT_MIN);
     printf("INT_MAX: %d\n", INT_MAX);
@@ -139,7 +133,7 @@ LONG_MAX: 9223372036854775807
 ```
 
 Obviously the number has overflown.
-To fix this problem, we need change the variable `diff` in `timespec_cmp` 
+To fix this problem, we need change the variable `diff` in `timespec_cmp`
 function in `lib/timespec.h` from type int to type long.
 
 The new function looks like following:
@@ -157,22 +151,23 @@ timespec_cmp (struct timespec a, struct timespec b)
     return -1;
 }
 ```
+
 The patch file looks like this:
 ``` diff
---- timespec.h  2019-02-09 15:20:26.332751000 -0800
-+++ timespec.h.orig     2019-02-09 13:36:42.739426000 -0800
-@@ -45,12 +45,8 @@
+--- timespec.h.orig	2019-02-09 13:36:42.739426000 -0800
++++ timespec.h	2019-02-09 15:20:26.332751000 -0800
+@@ -45,8 +45,12 @@
  static inline int
  timespec_cmp (struct timespec a, struct timespec b)
  {
--  if (a.tv_sec == b.tv_sec)
--    return a.tv_nsec - b.tv_nsec;
--  if (a.tv_sec > b.tv_sec)
--    return 1;
--  else
--    return -1;
-+  int diff = a.tv_sec - b.tv_sec;
-+  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  if (a.tv_sec == b.tv_sec)
++    return a.tv_nsec - b.tv_nsec;
++  if (a.tv_sec > b.tv_sec)
++    return 1;
++  else
++    return -1;
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
  }
 ```
 
@@ -183,8 +178,11 @@ result.
 -rw-r--r-- 1 classqze class 0 2019-02-09 23:29:49.608177000 +0000 now1
 -rw-r--r-- 1 classqze class 0 2019-02-09 23:29:48.592825000 +0000 now
 ```
+
 I noticed that the modification date of 'wwi-armistice', instead of
 '1918-11-11 11:00 GMT', is '2054-12-17 17:28:16 GMT'.
-TODO: explain this.
-
-
+After some research, I find out that this is what people call "year 2038
+problem". Essentially, the modification time, a 32-bits integer, overflows after
+"03:14:07 UTC on 19 January 2038". On the reverse direction, the ancient file
+from 1918's modification date is recognized as the result of an
+overflow and therefore becomes a future file.
