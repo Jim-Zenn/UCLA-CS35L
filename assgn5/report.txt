@@ -1,0 +1,15 @@
+First I write `tr2b.c` and `tr2u.c`.
+The two programs have a very similar structure. They have the same basic check,
+namely:
+  1. check if there are exactly 2 operands: `from` and `to`.
+  2. check if `from` and `to` have the same length.
+  3. check if `from` has duplicate characters.
+Then the two program starts two differ.
+  `tr2b` uses buffered I/O, namely, `getchar` and `putchar` from `stdio.h`.
+  `tr2u` uses unbuffered I/O, namely, `read` and `write` from `unistd.h`.
+To test the efficiency of the two programs, we use a file that contains
+5000000 bytes. To generate such a file we use the following command:
+``` shell
+head --bytes=5000000 /dev/urandom > tr_test.txt
+```
+
