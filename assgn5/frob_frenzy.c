@@ -39,6 +39,16 @@ int main()
   for (char c = 0; c < CHAR_MAX; c ++) {
     printf("\\%d", frob[c + 128]);
   }
+  putchar('\n');
+  putchar('\n');
+
+  for (char c = 0; c < CHAR_MAX; c ++) {
+    printf("\\%03d", orig[c + 128]);
+  }
+  putchar('\n');
+  for (char c = 0; c < CHAR_MAX; c ++) {
+    printf("\\%03d", frob[c + 128]);
+  }
 
   return 0;
 }
