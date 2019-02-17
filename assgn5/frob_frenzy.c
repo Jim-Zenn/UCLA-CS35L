@@ -17,13 +17,9 @@ int main()
     orig[c + 128] = c;
     frob[c + 128] = c;
   }
-  memfrob(frob, 128);
+  memfrob(frob, 255);
   for (char c = CHAR_MIN; c < CHAR_MAX; c ++) {
-    putchar(orig[c + 128]);
-  }
-  putchar('\n');
-  for (char c = CHAR_MIN; c < CHAR_MAX; c ++) {
-    putchar(frob[c + 128]);
+    printf("%d\t%d\n", orig[c + 128], frob[c + 128]);
   }
   putchar('\n');
 
