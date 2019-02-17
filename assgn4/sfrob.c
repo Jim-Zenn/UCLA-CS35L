@@ -5,18 +5,6 @@
 #define DEFAULT_WORD_ARRAY_CAPACITY 128
 #define SCALING_FACTOR 2
 
-// frobnicate the char and return it
-char frob(const char c);
-
-// frobnicate the given char in place
-void m_bytfrob(char * c);
-
-// frobnicate n char in the given array
-void m_memfrob(char * a, int n);
-
-// print n char in the given array
-void m_memprint(char * a, int n);
-
 // compare two given frobnicated string.
 // Return 1 if the original string of s1 is 'greater than' that of s2,
 // return 0 if equal, -1 otherwise.
@@ -32,7 +20,7 @@ int main() {
   char * wordbuf = (char *) malloc(word_buf_cap * sizeof(char));
   char ** arrbuf = (char **) malloc(array_buf_cap * sizeof(char *));
   int i = 0, word_count = 0;
-  while(!feof(stdin)) {
+  while (!feof(stdin)) {
     c = getchar();
     wordbuf[i] = c;
     i += 1;
@@ -85,36 +73,11 @@ int main() {
   return 0;
 }
 
-char frob(const char c) {
-  return c ^ 42;
-}
-
-void m_bytfrob(char * c) {
-  *c = *c ^ 42;
-}
-
-void m_memfrob(char * a, int n) {
-  char *p = a;
-  for (int i = 0; i < n; i++) {
-    p += 1;
-    m_bytfrob(p);
-  }
-}
-
-void m_memprint(char * a, int n) {
-  char *p = a;
-  for (int i = 0; i < n; i++) {
-    p += 1;
-    putchar(*p);
-  }
-  putchar('\n');
-}
-
 int frobcmp(const void * s1, const void * s2) {
   char *a = (char *) s1, *b = (char *) s2;
   while (*a != ' ' || *b != ' ') {
-    if (frob(*a) < frob(*b))  return -1;
-    if (frob(*a) > frob(*b))  return 1;
+    if ((*a ^ 42) < (*b ^ 42))  return -1;
+    if ((*a ^ 42) > (*b ^ 42))  return 1;
     a++; b++;
   }
   if (*a == ' ')  return -1;
