@@ -23,5 +23,15 @@ int main()
   }
   putchar('\n');
 
+  for (char c = CHAR_MIN; c < CHAR_MAX; c ++) {
+    printf("%d", orig[c + 128]);
+  }
+  putchar('\n');
+  for (char c = CHAR_MIN; c < CHAR_MAX; c ++) {
+    printf("%d", frob[c + 128]);
+  }
+  putchar('\n');
+
   return 0;
 }
+
