@@ -18,36 +18,13 @@ int main()
     frob[c + 128] = c;
   }
   memfrob(frob, 255);
-  for (char c = CHAR_MIN; c < CHAR_MAX; c ++) {
-    printf("%d\t%d\n", orig[c + 128], frob[c + 128]);
-  }
-  putchar('\n');
-
-  for (char c = CHAR_MIN; c < CHAR_MAX; c ++) {
-    printf("\\%d", orig[c + 128]);
-  }
-  putchar('\n');
-  for (char c = CHAR_MIN; c < CHAR_MAX; c ++) {
-    printf("\\%d", frob[c + 128]);
-  }
-  putchar('\n');
-
   for (char c = 0; c < CHAR_MAX; c ++) {
-    printf("\\%d", orig[c + 128]);
+    printf("%c", orig[c + 128]);
   }
+  putchar('\n');
   putchar('\n');
   for (char c = 0; c < CHAR_MAX; c ++) {
-    printf("\\%d", frob[c + 128]);
-  }
-  putchar('\n');
-  putchar('\n');
-
-  for (char c = 0; c < CHAR_MAX; c ++) {
-    printf("\\%03d", orig[c + 128]);
-  }
-  putchar('\n');
-  for (char c = 0; c < CHAR_MAX; c ++) {
-    printf("\\%03d", frob[c + 128]);
+    printf("%c", frob[c + 128]);
   }
 
   return 0;
