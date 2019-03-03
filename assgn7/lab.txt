@@ -1,0 +1,328 @@
+1. I used vim to create the c program. The program is as follows:
+
+``` C
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    printf("%.17g\n", cos(sqrt(3.0)));
+    return 0;
+}
+```
+
+2. I then compiled it with gcc, and see its dynamic libraries dependency using the 
+following command:
+```
+gcc cos_sqrt.c -o cos_sqrt
+ldd cos_sqrt
+```
+
+The output is as follows:
+```
+        linux-vdso.so.1 =>  (0x00007ffeb3f88000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007f66cb2b3000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f66cb680000)
+```
+
+It shows that 3 dynamic libraries are used here.
+
+3. To see what system calls my trivial program makes, I use strace command, and
+writes its stderr output into 'strace.log'.
+
+```
+execve("./cos_sqrt", ["./cos_sqrt"], [/* 36 vars */]) = 0
+brk(NULL)                               = 0x109e000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff7dac43000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=168106, ...}) = 0
+mmap(NULL, 168106, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7ff7dac19000
+close(3)                                = 0
+open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\340$\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2151672, ...}) = 0
+mmap(NULL, 3981792, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7ff7da656000
+mprotect(0x7ff7da818000, 2097152, PROT_NONE) = 0
+mmap(0x7ff7daa18000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c2000) = 0x7ff7daa18000
+mmap(0x7ff7daa1e000, 16864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7ff7daa1e000
+close(3)                                = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff7dac18000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff7dac16000
+arch_prctl(ARCH_SET_FS, 0x7ff7dac16740) = 0
+mprotect(0x7ff7daa18000, 16384, PROT_READ) = 0
+mprotect(0x600000, 4096, PROT_READ)     = 0
+mprotect(0x7ff7dac44000, 4096, PROT_READ) = 0
+munmap(0x7ff7dac19000, 168106)          = 0
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(136, 8), ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ff7dac42000
+write(1, "-0.16055653857469052\n", 21)  = 21
+exit_group(0)                           = ?
++++ exited with 0 +++
+```
+
+1) execve("./cos_sqrt", ["./cos_sqrt"], [/* 36 vars */])
+This call executes cos_sqrt with its path as the first argument, and 36
+environment variables. This is not related to any library.
+
+2) brk(NULL) = 0x109e000
+brk is used to set the end of the data segment to the value specified by its
+first parameter `addr`.  However, here, the parameter is NULL. It doesn't make
+sense at the first glance.  But reading the 'Linux notes' section of the 
+`man brk` gives me some clue.
+
+> ... the actual Linux system call return the new program break on success.  On 
+failure, the system call returns the current break.
+
+Since this brk system call to set the end of the data segment to NULL will
+always fail, this call is likely used to check the current program break's
+address. Which is 0x109e000. It is not related to any library as well.
+
+
+3) mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) 
+                                                                = 0x7ff7dac43000
+
+mmap is used to create a new mapping in the virtual address space of the calling
+process. The starting addres for the new mapping is specified in the first
+parameter addr, the second argument indicates the length of the mapping.
+
+Here, the addr is set to NULL. According to `man mmap`, if the addr is NULL, 
+then the kernel chooses the address instead. The length of the mapping is 4096;
+The thrid argument specifies that the pages may be read or written; the fourth
+argument requires the updates to the mapping are private; what's more,
+this mapping is not backed by any file (MAP_ANONYMOUS, that's also why the fifth
+argument, fd, is set to -1; it indicates no actual file is backing this
+writing).
+
+Essentially, what mmap does here is still part of the initialization and is not
+related to any libraries yet.
+
+4) access("/etc/ld.so.preload", R_OK) = -1 ENOENT (No such file or directory)
+
+occess is used to check whether the calling process can access the given file.
+The second parameter specifies which accessibility check(s) to be performed.
+Here, this access call want ot see if the calling process has read access to
+`/etc/ld.so.preload`; the return value indicates that this file simply does not
+exists.
+
+`/etc/ld.so.preload`, if exists, works like the LD_PRELOAD environmental
+variable, but with less restriction. LD_PRELOAD is subject to the restriction
+that it cannot execute setuid binaries due to security concerns; however, since
+`/etc/ld.so.preload` is owned by root, is trusted to have no malicious binaries.
+
+reference:
+https://superuser.com/questions/1183037/what-is-does-ld-so-preload-do
+
+Here, the ld linker is obviously checking if there is some dynamic library that
+the root user demands to link before other libraries. Still this is not related
+to any specific libraries yet.
+
+5) open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+
+open opens the file at the given path, and returns a file descriptor.
+
+Here `/etc/ld.so.cache` is being opened. To understand what is happening here, I
+read `man 8 ld.so` and `man 8 ldconfig`. It turns out that `ld.so.cache` caches
+the map from plain shared library names (e.g. libc.so.6) to the full path (e.g.
+/lib64/libc.so.6).
+
+The file is opened, so that ld can find the true locations of the required
+shared libraries. The file is set to be read only, and will clase on execution.
+
+6) fstat(3, {st_mode=S_IFREG|0644, st_size=168106, ...}) = 0
+
+fstat is used to return information about a file (specified by the file
+descriptor) in a given buf.
+
+Here, as is seen above, file descriptor 3 corresponds to the file
+`/etc/ld.so.cache`. This system call checks its status for the reason we are
+going to see in the following system call.
+
+7) mmap(NULL, 168106, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7ff7dac19000
+
+This is the second time we see mmap. Here, what mmap does is mapping the
+`/etc/ld.so.cache` (fd=3) file to the virtual address space, so that the linker 
+can scan through it.
+
+8) close(3) = 0
+
+close closes the file descriptor 3, so that 3 can be reused. Since the file is
+already mapped onto the virtual address space.
+
+Notice that closing the file descriptor WILL NOT unmap the region, according to
+`man 2 mmap`. Hence, the program still have access to the file.
+
+9) open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+
+This is the first system call that is related to a specific library. Apparently,
+ld sees that libc.so.6 is required; hence the corresponding file is opened.
+Again, the library is set to be read only, and will close on execution, which
+makes sense.
+
+Notice that now file descriptor 3 is assigned to "/lib64/libc.so.6"
+
+10) read(3, 
+   "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\340$\2\0\0\0\0\0"..., 832)
+                                                                          = 832
+This system call reads 832 bytes from the `libc.so.6`. It is curious to me that
+a number 832 is specified. Why does the read command only requires 832 bytes?
+
+After some investigation, it seems that the first 832 bytes composes the ELF
+header (ELF stands for Executable and Linkable Format).
+
+According to wikipedia, the header contains:
+- Program header table, describing zero or more memory segments
+- Section header table, describing zero or more sections
+- Data referred to by entries in the program header table or section header 
+  table
+
+Also,
+
+> The segments contain information that is needed for run time execution of the
+file, while sections contain important data for linking and relocation. Any byte
+in the entire file can be owned by one section at most, and orphan bytes can
+occur which are unowned by any section.
+
+reference: https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
+
+Hence, reading the header is crucial here given that the library is to be used.
+This system call is therefore still related to libc.so.6.
+
+11) fstat(3, {st_mode=S_IFREG|0755, st_size=2151672, ...}) = 0
+12) mmap(NULL, 3981792, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0)
+                                                               = 0x7ff7da656000
+13) mprotect(0x7ff7da818000, 2097152, PROT_NONE) = 0
+
+These system calls need to be inspected together, so it can make more sense.
+What happens on 11) and 12) should be similar to what happened in 6) and 7).
+In short, the fstat gets the info of the library file.
+Then, mmap maps the file onto a virtual address space, such that it can be
+accessed later.
+
+mprotect provides a way to alter the protection flag. The first parameter is the
+address where protection alteration starts, and the second parameter is the 
+length of the region.
+Here, the chosen segment of memory is then rendered unaccessible by setting its
+protection flag to PROT_NONE.
+According to MSDN, this could be a technique to mitigate against exploitation of
+heap overflows.
+
+reference:
+https://docs.microsoft.com/en-us/windows/desktop/Memory/creating-guard-pages
+
+However, there is something to notice here. Despite that the file is known to
+have a size of 2151672 bytes (line 11), mmap requested a much larger address
+space (3981792 bytes). I will try to make sense of it in the next system call.
+
+ file begin [0x7FF7DA656000] + 0x020D4F8 = file end
+(addr begin)                 + 0x03CC1E0 = addr end
+                             + 0x01c2000 = prot begin
+ prot begin [0x7FF7DA818000] + 0x2000000 = prot end
+ file end   [0x7FF7DA8634F8]
+ prot end   [0x7FF7DAA18000]
+ addr end   [0x7FF7DAA221E0]
+
+These calls are still dealing with libc.so.6.
+
+14) mmap(0x7ff7daa18000, 24576, PROT_READ|PROT_WRITE,
+         MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c2000) = 0x7ff7daa18000
+15) mmap(0x7ff7daa1e000, 16864, 
+         PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0)
+                                                           = 0x7ff7daa1e000
+Despite my best effort, I was not able to decypher the mmaps here. However, one
+thing is for sure: it is still maping libc.so.6 library into the virtual address
+space, such that it can be used later.
+
+16) close(3) = 0
+This line closes the file descriptor for libc.so.6, meaning the program has
+already get the part of library it requires for my trivial program.
+
+17) mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) 
+                                                                = 0x7ff7dac18000
+18) mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) 
+                                                                = 0x7ff7dac16000
+These two lines are most likely used to assign some memory space for the
+program, similar to malloc.
+
+19-28) The rest of the program doesn't look like they have anything to do with
+the dynamic linking process any more. Hence, I will stop the analysis at this
+point.
+
+In conclusion, line 4 through 7, prepares for dynamic linking, line 8 through 16
+deals with libc.so.6 linking specifically.
+
+4. With command:
+```
+ls /usr/bin | awk 'NR%101==005181694%101'
+```
+I get the following list
+```
+alsaucm
+c++filt
+cmuwmtopbm
+db2rtf
+dropdb
+fc-query
+get_moz_enUS.py
+graphml2gv
+gvfs-rename
+idlj
+json_pp
+kopete
+libieee1284_test
+makedepend
+mvxattr
+nohup
+painter.py
+parec
+perlivp
+pldd
+po2oo
+ppmtopict
+rasttopnm
+rpmdev-sha384
+sgitopnm
+startkde
+testrb
+usb-devices
+xdriinfo
+yum-builddep
+```
+Running `ldd` one each command is a hassle. Therefore I use a shell script to do
+this job. The script is as follows:
+
+``` bash
+#!/bin/bash
+# ldd_scan.sh
+
+for x in "`ls /usr/bin | awk 'NR%101==505008404%101'`";
+do
+    ldd `which $x`
+done
+```
+
+Note: not a dynamic executable is not counted as error, since it is not. The
+binaries were generated with static linking.
+
+The binaries which I got errors on are as follows:
+
+1) /usr/bin/locate
+error message:
+   ldd: error: you do not have read permission for `/usr/bin/locate'
+This is very straight forward, since the binary is owned by root, and I only
+have execution permission, I am not allowed to inspect its shared library
+dependency. (need read permission)
+
+This is the only error I get.
+
+6. Given the script, to generate a list of common shared library dependency is
+not that hard. We can use the following command:
+
+```
+./ldd_scan.sh | grep ".so.*=>" | sed "s/(.*//g" | sort -u > dependencies.log
+```
+
+The list is as follows:
+
+```
+
+```
