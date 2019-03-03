@@ -9,6 +9,6 @@ randlibsw.so: randlibsw.o
 randlibsw.o: randlibsw.c
 	$(CC) $(CFLAGS) -fPIC -c randlibsw.c -o randlibsw.o
 randlibhw.so: randlibhw.o
-	$(CC) $(CFLAGS) randlibhw.c -fPIC -shared -o randlibhw.so
+	$(CC) $(CFLAGS) -shared randlibhw.c -o randlibhw.so
 randlibhw.o: randlibhw.c
 	$(CC) $(CFLAGS) -fPIC -c randlibhw.c -o randlibhw.o
