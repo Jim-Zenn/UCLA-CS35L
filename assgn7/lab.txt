@@ -318,7 +318,7 @@ This is the only error I get.
 not that hard. We can use the following command:
 
 ```
-./ldd_scan.sh | grep ".so.*=>" | sed "s/(.*//g" | sort -u > dependencies.log
+./ldd_scan.sh | grep ".so.*=>" | sed "s/(.*$//g;s/^[[:blank:]]//g" | sort -u
 ```
 
 The list is as follows:
